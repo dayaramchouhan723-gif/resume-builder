@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ResumeAI Pro – Free ATS Resume Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0b0f;
+  --surface:#13151d;
+  --surface2:#1c1f2b;
+  --border:#2a2d3e;
+  --accent:#4f8ef7;
+  --accent2:#7c5cfa;
+  --green:#22c55e;
+  --yellow:#f59e0b;
+  --red:#ef4444;
+  --text:#f0f2ff;
+  --muted:#6b7280;
+  --radius:12px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,11,15,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-tabs{display:flex;gap:4px}
+.nav-tab{padding:7px 18px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);transition:all .2s;border:none;background:none}
+.nav-tab.active,.nav-tab:hover{background:var(--surface2);color:var(--text)}
+.nav-tab.active{color:var(--accent)}
+
+/* HERO */
+.hero{padding:120px 32px 60px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(79,142,247,0.15),transparent)}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(36px,6vw,72px);font-weight:900;line-height:1.1;margin-bottom:20px}
+.hero h1 span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:18px;color:var(--muted);max-width:600px;margin:0 auto 40px}
+.badge-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:40px}
+.badge{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid;letter-spacing:.5px}
+.badge.blue{color:var(--accent);border-color:rgba(79,142,247,.3);background:rgba(79,142,247,.08)}
+.badge.green{color:var(--green);border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.08)}
+.badge.purple{color:#a78bfa;border-color:rgba(167,139,250,.3);background:rgba(167,139,250,.08)}
+
+/* MAIN APP */
+.app{max-width:1400px;margin:0 auto;padding:0 20px 80px}
+.section{display:none}
+.section.active{display:block}
+
+/* STEP INDICATOR */
+.steps{display:flex;gap:0;margin-bottom:40px;background:var(--surface);border-radius:var(--radius);padding:6px;border:1px solid var(--border)}
+.step{flex:1;padding:10px;border-radius:8px;text-align:center;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);transition:all .2s}
+.step.active{background:var(--accent);color:#fff}
+.step.done{color:var(--green)}
+.step-num{display:inline-block;width:20px;height:20px;border-radius:50%;background:var(--surface2);font-size:11px;line-height:20px;margin-right:6px}
+.step.active .step-num{background:rgba(255,255,255,.2)}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px}
+.card h3{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.card h3 span{font-size:20px}
+
+/* COUNTRY GRID */
+.country-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.country-card{background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:all .2s;position:relative}
+.country-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.country-card.selected{border-color:var(--accent);background:rgba(79,142,247,.1)}
+.country-card .flag{font-size:32px;display:block;margin-bottom:8px}
+.country-card .name{font-weight:700;font-size:14px;margin-bottom:4px}
+.country-card .format{font-size:11px;color:var(--muted)}
+.country-card .sel-check{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;background:var(--accent);display:none;align-items:center;justify-content:center;font-size:11px}
+.country-card.selected .sel-check{display:flex}
+
+/* TEMPLATE GRID */
+.template-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.template-card{background:var(--surface2);border:2px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:all .2s}
+.template-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.template-card.selected{border-color:var(--accent)}
+.template-preview{height:140px;display:flex;align-items:center;justify-content:center;font-size:40px;position:relative;overflow:hidden}
+.template-name{padding:10px 14px;font-size:13px;font-weight:700}
+.template-tag{font-size:10px;color:var(--muted);padding:0 14px 10px}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-grid.full{grid-template-columns:1fr}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.form-group input,.form-group textarea,.form-group select{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;width:100%}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--accent)}
+.form-group textarea{min-height:100px;resize:vertical}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.add-btn{padding:7px 16px;background:rgba(79,142,247,.15);border:1px solid rgba(79,142,247,.3);color:var(--accent);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s}
+.add-btn:hover{background:rgba(79,142,247,.25)}
+.remove-btn{padding:4px 10px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:var(--red);border-radius:6px;cursor:pointer;font-size:12px}
+.entry-block{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px;position:relative}
+
+/* ATS SCORE */
+.ats-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px}
+.score-ring{width:140px;height:140px;margin:0 auto 20px;position:relative}
+.score-ring svg{transform:rotate(-90deg)}
+.score-ring .score-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.score-num{font-size:36px;font-weight:900;font-family:'Playfair Display',serif}
+.score-label{font-size:11px;color:var(--muted);font-weight:600}
+.checks-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.check-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;font-size:13px}
+.check-item.pass{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2)}
+.check-item.warn{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2)}
+.check-item.fail{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2)}
+.check-icon{font-size:16px;flex-shrink:0}
+.check-text{flex:1}
+.check-title{font-weight:600;margin-bottom:2px}
+.check-desc{font-size:11px;color:var(--muted)}
+
+/* JOB MATCH */
+.job-textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;resize:vertical;min-height:120px;outline:none}
+.job-textarea:focus{border-color:var(--accent)}
+.keywords-cloud{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.kw-tag{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600}
+.kw-tag.found{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.kw-tag.missing{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2)}
+
+/* PREVIEW */
+.preview-area{background:#f8f8f8;border-radius:var(--radius);padding:20px;min-height:500px;color:#1a1a2e}
+.preview-resume{max-width:700px;margin:0 auto;background:#fff;padding:40px;border-radius:8px;box-shadow:0 4px 40px rgba(0,0,0,.15);font-family:'DM Sans',sans-serif}
+
+/* RESUME STYLES */
+.resume-classic .res-header{text-align:center;border-bottom:2px solid #1a1a2e;padding-bottom:16px;margin-bottom:20px}
+.resume-classic .res-name{font-size:28px;font-weight:800;color:#1a1a2e;letter-spacing:-0.5px}
+.resume-classic .res-title{font-size:14px;color:#555;margin-top:4px}
+.resume-classic .res-contact{font-size:12px;color:#555;margin-top:8px}
+.resume-classic .res-section-title{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#1a1a2e;border-bottom:1px solid #ddd;padding-bottom:4px;margin:16px 0 10px}
+.resume-classic .res-entry{margin-bottom:14px}
+.resume-classic .res-role{font-weight:700;font-size:14px;color:#1a1a2e}
+.resume-classic .res-company{font-size:13px;color:#444;margin-bottom:4px}
+.resume-classic .res-date{font-size:11px;color:#888;float:right}
+.resume-classic .res-desc{font-size:12px;color:#555;line-height:1.6;margin-top:4px}
+.resume-classic .res-skills{display:flex;flex-wrap:wrap;gap:8px}
+.resume-classic .skill-tag{padding:3px 10px;border-radius:4px;border:1px solid #ddd;font-size:11px;color:#333}
+
+.resume-modern .res-header{background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;padding:24px;margin:-40px -40px 24px;border-radius:8px 8px 0 0}
+.resume-modern .res-name{font-size:28px;font-weight:800;letter-spacing:-0.5px}
+.resume-modern .res-title{font-size:14px;opacity:.8;margin-top:4px}
+.resume-modern .res-contact{font-size:12px;opacity:.7;margin-top:8px}
+.resume-modern .res-section-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:#1a1a2e;margin:16px 0 10px;display:flex;align-items:center;gap:8px}
+.resume-modern .res-section-title::after{content:'';flex:1;height:1px;background:#eee}
+.resume-modern .res-role{font-weight:700;font-size:14px;color:#1a1a2e}
+.resume-modern .res-company{font-size:13px;color:#666}
+.resume-modern .res-date{font-size:11px;color:#999;font-weight:600}
+.resume-modern .res-desc{font-size:12px;color:#555;line-height:1.6;margin-top:6px}
+.resume-modern .res-skills{display:flex;flex-wrap:wrap;gap:6px}
+.resume-modern .skill-tag{padding:4px 12px;border-radius:20px;background:#f0f4ff;font-size:11px;color:#1a1a2e;font-weight:600}
+
+.resume-europass .res-header{border-left:4px solid #003399;padding-left:16px;margin-bottom:20px}
+.resume-europass .res-name{font-size:24px;font-weight:700;color:#003399}
+.resume-europass .res-title{font-size:13px;color:#555;margin-top:4px}
+.resume-europass .res-section-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#003399;background:#f0f4ff;padding:6px 10px;margin:16px 0 10px;border-radius:4px}
+.resume-europass .res-role{font-weight:700;font-size:13px}
+.resume-europass .res-company{font-size:12px;color:#444}
+.resume-europass .res-date{font-size:11px;color:#888}
+.resume-europass .res-desc{font-size:12px;color:#555;line-height:1.6;margin-top:4px}
+.resume-europass .skill-tag{padding:2px 8px;border:1px solid #003399;border-radius:3px;font-size:11px;color:#003399}
+
+.resume-minimal .res-header{margin-bottom:24px}
+.resume-minimal .res-name{font-size:32px;font-weight:300;color:#000;letter-spacing:2px;text-transform:uppercase}
+.resume-minimal .res-title{font-size:13px;color:#888;margin-top:8px;letter-spacing:1px}
+.resume-minimal .res-contact{font-size:11px;color:#aaa;margin-top:6px}
+.resume-minimal .res-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:#aaa;margin:20px 0 10px}
+.resume-minimal .res-role{font-weight:600;font-size:14px;color:#000}
+.resume-minimal .res-company{font-size:13px;color:#555}
+.resume-minimal .res-date{font-size:11px;color:#aaa}
+.resume-minimal .res-desc{font-size:12px;color:#666;line-height:1.7}
+.resume-minimal .skill-tag{padding:2px 8px;border-bottom:1px solid #ddd;font-size:11px;color:#555}
+
+/* BUTTONS */
+.btn{padding:12px 28px;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;border:none;font-family:'DM Sans',sans-serif;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.btn-green{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:var(--green)}
+.btn-row{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .form-grid{grid-template-columns:1fr}
+  .steps .step span:not(.step-num){display:none}
+  nav{padding:0 16px}
+  .hero{padding:80px 16px 40px}
+}
+
+/* PROGRESS BAR */
+.progress-bar{height:4px;background:var(--surface2);border-radius:2px;margin-bottom:32px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .5s ease}
+
+/* COUNTRY INFO BOX */
+.country-info{background:rgba(79,142,247,.08);border:1px solid rgba(79,142,247,.2);border-radius:10px;padding:16px;margin-bottom:20px;display:none}
+.country-info.show{display:block}
+.country-info h4{font-size:14px;font-weight:700;margin-bottom:8px;color:var(--accent)}
+.country-info ul{list-style:none;display:flex;flex-direction:column;gap:4px}
+.country-info ul li{font-size:12px;color:var(--muted);padding-left:14px;position:relative}
+.country-info ul li::before{content:'→';position:absolute;left:0;color:var(--accent);font-size:10px}
+
+/* TABS */
+.tab-group{display:flex;gap:4px;margin-bottom:20px;background:var(--surface);padding:4px;border-radius:8px;border:1px solid var(--border)}
+.tab{padding:8px 20px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);transition:all .2s;border:none;background:none}
+.tab.active{background:var(--surface2);color:var(--text)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">ResumeAI Pro</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showSection('builder')">🏗️ Builder</button>
+    <button class="nav-tab" onclick="showSection('ats')">📊 ATS Score</button>
+    <button class="nav-tab" onclick="showSection('countries')">🌍 Formats</button>
+    <button class="nav-tab" onclick="showSection('preview')">👁️ Preview</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero" id="heroSection">
+  <h1>Build Your Perfect<br><span>ATS-Optimized Resume</span></h1>
+  <p>Free resume builder with real-time ATS scoring, 50+ country formats, and professional templates used by top recruiters worldwide.</p>
+  <div class="badge-row">
+    <div class="badge blue">✓ Free Forever</div>
+    <div class="badge green">✓ Real ATS Score</div>
+    <div class="badge purple">✓ 50+ Countries</div>
+    <div class="badge blue">✓ Europass Format</div>
+    <div class="badge green">✓ JobBank Canada</div>
+    <div class="badge purple">✓ US/UK/AU/India</div>
+  </div>
+  <button class="btn btn-primary" onclick="startBuilder()">🚀 Start Building Free</button>
+</div>
+
+<div class="app">
+  <!-- BUILDER SECTION -->
+  <div class="section active" id="builderSection">
+    <div class="steps">
+      <div class="step active" onclick="goToStep(1)" id="step1"><span class="step-num">1</span><span>Country</span></div>
+      <div class="step" onclick="goToStep(2)" id="step2"><span class="step-num">2</span><span>Template</span></div>
+      <div class="step" onclick="goToStep(3)" id="step3"><span class="step-num">3</span><span>Personal</span></div>
+      <div class="step" onclick="goToStep(4)" id="step4"><span class="step-num">4</span><span>Experience</span></div>
+      <div class="step" onclick="goToStep(5)" id="step5"><span class="step-num">5</span><span>Education</span></div>
+      <div class="step" onclick="goToStep(6)" id="step6"><span class="step-num">6</span><span>Skills</span></div>
+      <div class="step" onclick="goToStep(7)" id="step7"><span class="step-num">7</span><span>Finish</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:14%"></div></div>
+
+    <!-- STEP 1: COUNTRY -->
+    <div id="stepContent1" class="step-content">
+      <div class="card">
+        <h3><span>🌍</span> Select Your Target Country & Format</h3>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Each country has specific resume standards. We'll automatically adjust the format, sections, and style for you.</p>
+        <div class="country-grid" id="countryGrid"></div>
+      </div>
+      <div class="country-info" id="countryInfo">
+        <h4 id="countryInfoTitle">Country Format Details</h4>
+        <ul id="countryInfoList"></ul>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="nextStep()">Next: Choose Template →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: TEMPLATE -->
+    <div id="stepContent2" class="step-content" style="display:none">
+      <div class="card">
+        <h3><span>🎨</span> Choose Your Template Style</h3>
+        <div class="template-grid" id="templateGrid"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-outline" onclick="prevStep()">← Back</button>
+        <button class="btn btn-primary" onclick="nextStep()">Next: Personal Info →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: PERSONAL INFO -->
+    <div id="stepContent3" class="step-content" style="display:none">
+      <div class="card">
+        <h3><span>👤</span> Personal Information</h3>
+        <div class="form-grid">
+          <div class="form-group"><label>Full Name *</label><input id="f_name" placeholder="John Smith"></div>
+          <div class="form-group"><label>Job Title / Headline *</label><input id="f_title" placeholder="Senior Software Engineer"></div>
+          <div class="form-group"><label>Email *</label><input id="f_email" type="email" placeholder="john@email.com"></div>
+          <div class="form-group"><label>Phone *</label><input id="f_phone" placeholder="+1 (555) 000-0000"></div>
+          <div class="form-group"><label>City, Country</label><input id="f_location" placeholder="Toronto, Canada"></div>
+          <div class="form-group"><label>LinkedIn URL</label><input id="f_linkedin" placeholder="linkedin.com/in/johnsmith"></div>
+          <div class="form-group"><label>GitHub / Portfolio</label><input id="f_portfolio" placeholder="github.com/johnsmith"></div>
+          <div class="form-group"><label>Website</label><input id="f_website" placeholder="www.johnsmith.com"></div>
+        </div>
+        <div class="form-grid full" style="margin-top:16px">
+          <div class="form-group"><label>Professional Summary (2-4 sentences, keyword-rich)</label>
+          <textarea id="f_summary" placeholder="Results-driven software engineer with 5+ years of experience in full-stack development. Proven track record of delivering scalable solutions using Python, React, and AWS. Passionate about building user-centric products that drive business growth."></textarea></div>
+        </div>
+      </div>
+
+      <!-- Nationality fields (shown for some countries) -->
+      <div class="card" id="extraInfoCard">
+        <h3><span>📋</span> Additional Details <span style="font-size:12px;color:var(--muted);font-weight:400">(optional – country specific)</span></h3>
+        <div class="form-grid">
+          <div class="form-group"><label>Date of Birth</label><input id="f_dob" type="date"></div>
+          <div class="form-group"><label>Nationality</label><input id="f_nationality" placeholder="Canadian"></div>
+          <div class="form-group"><label>Work Authorization</label><input id="f_auth" placeholder="Permanent Resident / Citizen"></div>
+          <div class="form-group"><label>Languages</label><input id="f_languages" placeholder="English (Native), French (B2)"></div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-outline" onclick="prevStep()">← Back</button>
+        <button class="btn btn-primary" onclick="nextStep()">Next: Experience →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: EXPERIENCE -->
+    <div id="stepContent4" class="step-content" style="display:none">
+      <div class="card">
+        <div class="section-header">
+          <h3 style="margin:0"><span>💼</span> Work Experience</h3>
+          <button class="add-btn" onclick="addExperience()">+ Add Experience</button>
+        </div>
+        <div id="expContainer"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-outline" onclick="prevStep()">← Back</button>
+        <button class="btn btn-primary" onclick="nextStep()">Next: Education →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: EDUCATION -->
+    <div id="stepContent5" class="step-content" style="display:none">
+      <div class="card">
+        <div class="section-header">
+          <h3 style="margin:0"><span>🎓</span> Education</h3>
+          <button class="add-btn" onclick="addEducation()">+ Add Education</button>
+        </div>
+        <div id="eduContainer"></div>
+      </div>
+      <div class="card">
+        <div class="section-header">
+          <h3 style="margin:0"><span>🏆</span> Certifications & Awards</h3>
+          <button class="add-btn" onclick="addCert()">+ Add</button>
+        </div>
+        <div id="certContainer"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-outline" onclick="prevStep()">← Back</button>
+        <button class="btn btn-primary" onclick="nextStep()">Next: Skills →</button>
+      </div>
+    </div>
+
+    <!-- STEP 6: SKILLS -->
+    <div id="stepContent6" class="step-content" style="display:none">
+      <div class="card">
+        <h3><span>⚡</span> Skills</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Technical Skills (comma separated)</label>
+            <textarea id="f_techSkills" placeholder="Python, JavaScript, React, Node.js, AWS, Docker, SQL, Git"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Soft Skills (comma separated)</label>
+            <textarea id="f_softSkills" placeholder="Leadership, Problem Solving, Communication, Team Collaboration"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-header">
+          <h3 style="margin:0"><span>🚀</span> Projects</h3>
+          <button class="add-btn" onclick="addProject()">+ Add Project</button>
+        </div>
+        <div id="projectContainer"></div>
+      </div>
+      <div class="card">
+        <h3><span>🌐</span> Languages Known</h3>
+        <div class="form-grid full">
+          <div class="form-group"><input id="f_langs" placeholder="English (Native), Spanish (B2), French (A2)"></div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-outline" onclick="prevStep()">← Back</button>
+        <button class="btn btn-primary" onclick="nextStep()">Next: Review →</button>
+      </div>
+    </div>
+
+    <!-- STEP 7: FINISH -->
+    <div id="stepContent7" class="step-content" style="display:none">
+      <div class="card" style="text-align:center;padding:40px">
+        <div style="font-size:60px;margin-bottom:16px">🎉</div>
+        <h2 style="font-size:28px;margin-bottom:12px">Resume Ready!</h2>
+        <p style="color:var(--muted);margin-bottom:32px">Your ATS-optimized resume is ready. Preview it, check ATS score, or download now.</p>
+        <div class="btn-row" style="justify-content:center">
+          <button class="btn btn-primary" onclick="showSection('preview');generatePreview()">👁️ Preview Resume</button>
+          <button class="btn btn-green" onclick="showSection('ats');runATSScore()">📊 Check ATS Score</button>
+          <button class="btn btn-outline" onclick="downloadPDF()">⬇️ Download PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ATS SCORE SECTION -->
+  <div class="section" id="atsSection">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div>
+        <div class="ats-panel">
+          <h3 style="margin-bottom:20px;font-size:16px;font-weight:700">📊 ATS Score Analysis</h3>
+          <div class="score-ring">
+            <svg width="140" height="140" viewBox="0 0 140 140">
+              <circle cx="70" cy="70" r="60" fill="none" stroke="#1c1f2b" stroke-width="14"/>
+              <circle cx="70" cy="70" r="60" fill="none" stroke="url(#sg)" stroke-width="14" stroke-linecap="round" stroke-dasharray="377" id="scoreCircle" stroke-dashoffset="377"/>
+              <defs><linearGradient id="sg" x1="0%" y1="0%" x2="100%"><stop offset="0%" stop-color="#4f8ef7"/><stop offset="100%" stop-color="#22c55e"/></linearGradient></defs>
+            </svg>
+            <div class="score-text">
+              <div class="score-num" id="atsScoreNum">--</div>
+              <div class="score-label">ATS SCORE</div>
+            </div>
+          </div>
+          <div id="scoreGrade" style="text-align:center;font-size:14px;font-weight:700;margin-bottom:20px;color:var(--muted)">Fill resume to see score</div>
+          <ul class="checks-list" id="checksList"></ul>
+          <button class="btn btn-primary" style="width:100%;margin-top:20px;justify-content:center" onclick="runATSScore()">🔄 Re-analyze</button>
+        </div>
+      </div>
+      <div>
+        <div class="ats-panel" style="margin-bottom:20px">
+          <h3 style="margin-bottom:12px;font-size:15px;font-weight:700">🎯 Job Match Analysis</h3>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Paste the job description to find matching & missing keywords:</p>
+          <textarea class="job-textarea" id="jobDescription" placeholder="Paste job description here...&#10;&#10;Example:&#10;We are looking for a Python developer with experience in Django, REST APIs, PostgreSQL, Docker, AWS..."></textarea>
+          <button class="btn btn-primary" style="margin-top:12px" onclick="analyzeJobMatch()">🔍 Analyze Match</button>
+          <div id="keywordsResult" style="margin-top:16px;display:none">
+            <div style="margin-bottom:8px"><span style="font-size:12px;font-weight:700;color:var(--green)">✅ Keywords Found:</span></div>
+            <div class="keywords-cloud" id="foundKeywords"></div>
+            <div style="margin:12px 0 8px"><span style="font-size:12px;font-weight:700;color:var(--red)">❌ Missing Keywords:</span></div>
+            <div class="keywords-cloud" id="missingKeywords"></div>
+            <div id="matchScore" style="margin-top:12px;padding:12px;background:var(--surface2);border-radius:8px;font-size:14px;font-weight:700;text-align:center"></div>
+          </div>
+        </div>
+
+        <div class="ats-panel">
+          <h3 style="margin-bottom:12px;font-size:15px;font-weight:700">💡 ATS Tips by Country</h3>
+          <div id="atsTips" style="font-size:13px;color:var(--muted);line-height:1.8">
+            Select a country in the builder to see specific ATS tips.<br><br>
+            <strong style="color:var(--text)">Universal ATS Tips:</strong><br>
+            → Use standard section headings<br>
+            → Include keywords from job description<br>
+            → Avoid tables, graphics, headers/footers<br>
+            → Use .docx or PDF format<br>
+            → Keep formatting simple and clean<br>
+            → Use bullet points for achievements<br>
+            → Quantify your accomplishments
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COUNTRIES SECTION -->
+  <div class="section" id="countriesSection">
+    <div class="card">
+      <h3><span>🌍</span> Resume Formats by Country – Complete Reference Guide</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:24px">Each country has unique standards for resume format, length, photo requirements, and content. Use this guide to ensure compliance.</p>
+      <div id="fullCountryList"></div>
+    </div>
+  </div>
+
+  <!-- PREVIEW SECTION -->
+  <div class="section" id="previewSection">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+      <h2 style="font-size:20px;font-weight:700">Resume Preview</h2>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <select id="previewStyle" onchange="changePreviewStyle()" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 14px;border-radius:8px;font-size:13px">
+          <option value="classic">Classic</option>
+          <option value="modern">Modern</option>
+          <option value="europass">Europass</option>
+          <option value="minimal">Minimal</option>
+        </select>
+        <button class="btn btn-primary" onclick="downloadPDF()">⬇️ Download PDF</button>
+        <button class="btn btn-outline" onclick="window.print()">🖨️ Print</button>
+      </div>
+    </div>
+    <div class="preview-area">
+      <div class="preview-resume" id="resumePreview"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+const countries = [
+  {code:'us',flag:'🇺🇸',name:'United States',format:'US Resume',tips:['1-2 pages max','No photo required','No date of birth','Skills section essential','Reverse chronological order','Tailor for each application','Use ATS-friendly fonts']},
+  {code:'ca',flag:'🇨🇦',name:'Canada',format:'Canadian CV (JobBank)',tips:['1-2 pages','No photo required','Include PR/Visa status if applicable','Both English & French versions for QC','Follow JobBank.gc.ca standards','Skills-based format popular','Include references line']},
+  {code:'gb',flag:'🇬🇧',name:'United Kingdom',format:'UK CV',tips:['2 pages standard','No photo required','A4 paper format','Include hobbies/interests','Personal statement at top','Include nationality/right to work','Avoid American spelling']},
+  {code:'eu',flag:'🇪🇺',name:'European Union',format:'Europass CV',tips:['Europass template preferred','Photo may be required','Include nationality','EU-standard format','Language passport section','Digital skills section','Available at europass.eu']},
+  {code:'de',flag:'🇩🇪',name:'Germany',format:'Lebenslauf',tips:['Photo REQUIRED','Date of birth required','Reverse chronological order','2-3 pages for experienced','Include Ausbildung details','Formal and structured','Signature at bottom']},
+  {code:'fr',flag:'🇫🇷',name:'France',format:'CV Français',tips:['1-2 pages','Photo common but optional','Hobbies section expected','Include marital status optional','Short cover letter required','Skills section important','Avoid US-style resume']},
+  {code:'au',flag:'🇦🇺',name:'Australia',format:'Australian Resume',tips:['2-4 pages acceptable','No photo required','Include visa status','Reference page separate','Statement of purpose helpful','Australian spelling','Include Australian phone format']},
+  {code:'in',flag:'🇮🇳',name:'India',format:'Indian CV',tips:['2-3 pages common','Photo required in most cases','Include DOB, gender','Father\'s name in traditional formats','Objective statement popular','Include 10th/12th marks','Reference available on request']},
+  {code:'ae',flag:'🇦🇪',name:'UAE / Gulf',format:'Gulf CV',tips:['Photo REQUIRED','Date of birth required','Nationality required','Religion may be included','Marital status required','Visa status important','Arabic name transliteration']},
+  {code:'sg',flag:'🇸🇬',name:'Singapore',format:'Singapore CV',tips:['2-3 pages','Photo optional but common','Nationality required','PR status if applicable','English standard','Include NRIC status','Cover letter recommended']},
+  {code:'jp',flag:'🇯🇵',name:'Japan',format:'履歴書 Rirekisho',tips:['Use official 履歴書 format','Handwritten or typed','Photo REQUIRED','Seal stamp optional','Follow rigid structure','Include personal statement','Academic background critical']},
+  {code:'nz',flag:'🇳🇿',name:'New Zealand',format:'NZ Resume',tips:['2-3 pages','No photo required','Include residency/visa status','Referees at end','Casual but professional tone','NZ spelling and units','Include kiwi experience']},
+  {code:'za',flag:'🇿🇦',name:'South Africa',format:'SA CV',tips:['3-5 pages acceptable','Photo recommended','ID number often required','Include race for EE purposes','References included','SAQA qualifications','Include matric results']},
+  {code:'br',flag:'🇧🇷',name:'Brazil',format:'Currículo Brasileiro',tips:['2-3 pages','Photo common','Date of birth included','CPF number sometimes','Portuguese language','Include objective','References on request']},
+  {code:'mx',flag:'🇲🇽',name:'Mexico',format:'Currículum Vitae',tips:['2-3 pages','Photo REQUIRED','CURP number sometimes','Date of birth included','Spanish language','Formal tone','Cover letter (carta de presentación)']},
+  {code:'cn',flag:'🇨🇳',name:'China',format:'简历 Jianlì',tips:['1-2 pages','Photo REQUIRED','Date of birth required','CPC membership if applicable','University tier matters','Political face optional','Include GPA']},
+];
+
+const templates = [
+  {id:'classic',name:'Classic',tag:'Traditional · ATS Safe',emoji:'📋',colors:['#1a1a2e','#f8f8f8'],desc:'Timeless format, maximum ATS compatibility'},
+  {id:'modern',name:'Modern',tag:'Contemporary · ATS Safe',emoji:'✨',colors:['#1a1a2e','#4f8ef7'],desc:'Clean design with bold header'},
+  {id:'europass',name:'Europass',tag:'EU Standard · Official',emoji:'🇪🇺',colors:['#003399','#f0f4ff'],desc:'Official EU Europass format'},
+  {id:'minimal',name:'Minimal',tag:'Clean · Elegant',emoji:'◻️',colors:['#000','#fff'],desc:'Ultra-clean typographic design'},
+  {id:'creative',name:'Creative',tag:'Stand Out · ATS Friendly',emoji:'🎨',colors:['#7c5cfa','#1a1a2e'],desc:'Creative yet ATS compatible'},
+  {id:'executive',name:'Executive',tag:'Senior Level · Premium',emoji:'👔',colors:['#1a1a2e','#c9a84c'],desc:'Premium format for senior roles'},
+];
+
+// ===== STATE =====
+let currentStep = 1;
+let selectedCountry = 'us';
+let selectedTemplate = 'classic';
+let experiences = [];
+let educations = [];
+let certs = [];
+let projects = [];
+
+// ===== INIT =====
+window.onload = function(){
+  buildCountryGrid();
+  buildTemplateGrid();
+  addExperience();
+  addEducation();
+  buildFullCountryList();
+  showSection('builder');
+  document.getElementById('heroSection').style.display = 'none';
+};
+
+function startBuilder(){
+  document.getElementById('heroSection').style.display = 'none';
+}
+
+// ===== NAVIGATION =====
+function showSection(s){
+  document.querySelectorAll('.section').forEach(el=>el.classList.remove('active'));
+  document.getElementById(s+'Section').classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach((t,i)=>{
+    t.classList.toggle('active',['builder','ats','countries','preview'][i]===s);
+  });
+  if(s==='preview') generatePreview();
+}
+
+function goToStep(n){
+  if(n<1||n>7) return;
+  document.getElementById('stepContent'+currentStep).style.display='none';
+  document.getElementById('step'+currentStep).classList.remove('active');
+  currentStep=n;
+  document.getElementById('stepContent'+currentStep).style.display='block';
+  document.getElementById('step'+currentStep).classList.add('active');
+  document.getElementById('progressFill').style.width=(currentStep/7*100)+'%';
+}
+function nextStep(){goToStep(currentStep+1);}
+function prevStep(){goToStep(currentStep-1);}
+
+// ===== COUNTRY GRID =====
+function buildCountryGrid(){
+  const g = document.getElementById('countryGrid');
+  g.innerHTML = countries.map(c=>`
+    <div class="country-card ${c.code===selectedCountry?'selected':''}" onclick="selectCountry('${c.code}')" id="cc_${c.code}">
+      <div class="sel-check">✓</div>
+      <span class="flag">${c.flag}</span>
+      <div class="name">${c.name}</div>
+      <div class="format">${c.format}</div>
+    </div>`).join('');
+}
+
+function selectCountry(code){
+  selectedCountry = code;
+  document.querySelectorAll('.country-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('cc_'+code).classList.add('selected');
+  const c = countries.find(x=>x.code===code);
+  const info = document.getElementById('countryInfo');
+  info.classList.add('show');
+  document.getElementById('countryInfoTitle').textContent = c.flag+' '+c.name+' – '+c.format+' Standards';
+  document.getElementById('countryInfoList').innerHTML = c.tips.map(t=>`<li>${t}</li>`).join('');
+  updateATSTips(c);
+}
+
+function updateATSTips(c){
+  const el = document.getElementById('atsTips');
+  if(!el) return;
+  el.innerHTML = `<strong style="color:var(--text)">${c.flag} ${c.name} ATS Tips:</strong><br>${c.tips.map(t=>'→ '+t).join('<br>')}`;
+}
+
+// ===== TEMPLATE GRID =====
+function buildTemplateGrid(){
+  const g = document.getElementById('templateGrid');
+  g.innerHTML = templates.map(t=>`
+    <div class="template-card ${t.id===selectedTemplate?'selected':''}" onclick="selectTemplate('${t.id}')" id="tc_${t.id}">
+      <div class="template-preview" style="background:linear-gradient(135deg,${t.colors[0]},${t.colors[1]})">
+        <span style="font-size:48px">${t.emoji}</span>
+      </div>
+      <div class="template-name">${t.name}</div>
+      <div class="template-tag">${t.tag}</div>
+    </div>`).join('');
+}
+
+function selectTemplate(id){
+  selectedTemplate = id;
+  document.querySelectorAll('.template-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('tc_'+id).classList.add('selected');
+  document.getElementById('previewStyle').value = ['classic','modern','europass','minimal'].includes(id) ? id : 'modern';
+}
+
+// ===== DYNAMIC ENTRIES =====
+function addExperience(){
+  const id = 'exp_'+Date.now();
+  experiences.push(id);
+  const c = document.getElementById('expContainer');
+  c.insertAdjacentHTML('beforeend',`
+    <div class="entry-block" id="${id}">
+      <div style="display:flex;justify-content:space-between;margin-bottom:12px">
+        <strong style="font-size:13px">Experience #${experiences.length}</strong>
+        <button class="remove-btn" onclick="removeEntry('${id}','exp')">Remove</button>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Job Title *</label><input placeholder="Software Engineer" class="e_title"></div>
+        <div class="form-group"><label>Company *</label><input placeholder="Google Inc." class="e_company"></div>
+        <div class="form-group"><label>Start Date</label><input placeholder="Jan 2020" class="e_start"></div>
+        <div class="form-group"><label>End Date</label><input placeholder="Dec 2023 / Present" class="e_end"></div>
+        <div class="form-group"><label>Location</label><input placeholder="New York, USA" class="e_loc"></div>
+        <div class="form-group"><label>Industry</label><input placeholder="Technology" class="e_ind"></div>
+      </div>
+      <div class="form-group" style="margin-top:12px"><label>Key Achievements & Responsibilities (bullet points)</label>
+      <textarea class="e_desc" placeholder="• Developed and maintained 5+ microservices handling 1M+ requests/day&#10;• Led a team of 8 engineers to deliver project 2 months ahead of schedule&#10;• Reduced system latency by 40% through database optimization"></textarea></div>
+    </div>`);
+}
+
+function addEducation(){
+  const id = 'edu_'+Date.now();
+  educations.push(id);
+  const c = document.getElementById('eduContainer');
+  c.insertAdjacentHTML('beforeend',`
+    <div class="entry-block" id="${id}">
+      <div style="display:flex;justify-content:space-between;margin-bottom:12px">
+        <strong style="font-size:13px">Education #${educations.length}</strong>
+        <button class="remove-btn" onclick="removeEntry('${id}','edu')">Remove</button>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Degree / Qualification *</label><input placeholder="B.Sc. Computer Science" class="edu_deg"></div>
+        <div class="form-group"><label>Institution *</label><input placeholder="University of Toronto" class="edu_school"></div>
+        <div class="form-group"><label>Start Year</label><input placeholder="2016" class="edu_start"></div>
+        <div class="form-group"><label>End Year</label><input placeholder="2020" class="edu_end"></div>
+        <div class="form-group"><label>GPA / Grade</label><input placeholder="3.8/4.0 / First Class" class="edu_gpa"></div>
+        <div class="form-group"><label>Location</label><input placeholder="Toronto, Canada" class="edu_loc"></div>
+      </div>
+      <div class="form-group" style="margin-top:12px"><label>Notable Courses / Thesis / Activities</label>
+      <textarea class="edu_desc" placeholder="Relevant courses: Data Structures, Algorithms, Machine Learning&#10;Thesis: Distributed Systems for Large-Scale Data Processing"></textarea></div>
+    </div>`);
+}
+
+function addCert(){
+  const id = 'cert_'+Date.now();
+  certs.push(id);
+  document.getElementById('certContainer').insertAdjacentHTML('beforeend',`
+    <div class="entry-block" id="${id}">
+      <div style="display:flex;justify-content:space-between;margin-bottom:12px">
+        <strong style="font-size:13px">Certification</strong>
+        <button class="remove-btn" onclick="removeEntry('${id}','cert')">Remove</button>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Certification Name</label><input placeholder="AWS Solutions Architect" class="cert_name"></div>
+        <div class="form-group"><label>Issuer</label><input placeholder="Amazon Web Services" class="cert_org"></div>
+        <div class="form-group"><label>Year</label><input placeholder="2023" class="cert_year"></div>
+        <div class="form-group"><label>Credential ID</label><input placeholder="AWS-12345" class="cert_id"></div>
+      </div>
+    </div>`);
+}
+
+function addProject(){
+  const id = 'proj_'+Date.now();
+  projects.push(id);
+  document.getElementById('projectContainer').insertAdjacentHTML('beforeend',`
+    <div class="entry-block" id="${id}">
+      <div style="display:flex;justify-content:space-between;margin-bottom:12px">
+        <strong style="font-size:13px">Project</strong>
+        <button class="remove-btn" onclick="removeEntry('${id}','proj')">Remove</button>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Project Name</label><input placeholder="E-Commerce Platform" class="proj_name"></div>
+        <div class="form-group"><label>Technologies</label><input placeholder="React, Node.js, MongoDB" class="proj_tech"></div>
+        <div class="form-group"><label>URL / GitHub</label><input placeholder="github.com/user/project" class="proj_url"></div>
+        <div class="form-group"><label>Year</label><input placeholder="2023" class="proj_year"></div>
+      </div>
+      <div class="form-group" style="margin-top:12px"><label>Description</label>
+      <textarea class="proj_desc" placeholder="Built a full-stack e-commerce platform serving 10,000+ users..."></textarea></div>
+    </div>`);
+}
+
+function removeEntry(id,type){
+  document.getElementById(id).remove();
+}
+
+// ===== ATS SCORE =====
+function getFormData(){
+  return {
+    name: document.getElementById('f_name').value,
+    title: document.getElementById('f_title').value,
+    email: document.getElementById('f_email').value,
+    phone: document.getElementById('f_phone').value,
+    location: document.getElementById('f_location').value,
+    linkedin: document.getElementById('f_linkedin').value,
+    summary: document.getElementById('f_summary').value,
+    techSkills: document.getElementById('f_techSkills').value,
+    softSkills: document.getElementById('f_softSkills').value,
+  };
+}
+
+function runATSScore(){
+  const d = getFormData();
+  const expDescs = [...document.querySelectorAll('.e_desc')].map(e=>e.value).join(' ');
+  const allText = [d.name,d.title,d.email,d.summary,d.techSkills,d.softSkills,expDescs].join(' ');
+
+  const checks = [
+    {key:'name',title:'Contact Info Complete',pass:d.name&&d.email&&d.phone,warn:false,desc:d.name&&d.email&&d.phone?'Name, email & phone found':'Add your name, email, and phone number'},
+    {key:'title',title:'Professional Title / Headline',pass:d.title.length>3,warn:false,desc:d.title.length>3?'Job title present':'Add a professional headline/title'},
+    {key:'summary',title:'Professional Summary',pass:d.summary.length>50,warn:d.summary.length>0&&d.summary.length<50,desc:d.summary.length>100?'Strong summary detected':'Add a 2-4 sentence keyword-rich summary'},
+    {key:'skills',title:'Skills Section',pass:d.techSkills.length>10,warn:false,desc:d.techSkills.length>10?'Technical skills listed':'Add your technical skills separated by commas'},
+    {key:'exp',title:'Work Experience',pass:document.querySelectorAll('.e_title').length>0&&document.querySelectorAll('.e_title')[0].value.length>0,warn:false,desc:'Experience section with job titles'},
+    {key:'bullets',title:'Achievement Bullets',pass:expDescs.includes('•')||expDescs.includes('-'),warn:false,desc:expDescs.includes('•')?'Bullet points found in experience':'Use bullet points (•) for achievements'},
+    {key:'quantify',title:'Quantified Achievements',pass:/\d+%|\d+x|\d+\+|\$\d|#\d/.test(expDescs)||/million|thousand|revenue|saved|improved/i.test(expDescs),warn:false,desc:'Numbers/metrics detected? Quantify your impact'},
+    {key:'linkedin',title:'LinkedIn Profile',pass:d.linkedin.length>5,warn:false,desc:d.linkedin.length>5?'LinkedIn URL found':'Add your LinkedIn profile URL'},
+    {key:'keywords',title:'Industry Keywords',pass:d.techSkills.split(',').length>=5,warn:d.techSkills.split(',').length>=2&&d.techSkills.split(',').length<5,desc:d.techSkills.split(',').length>=5?'Good keyword density':'Add more industry-specific keywords'},
+    {key:'length',title:'Resume Length',pass:allText.length>300,warn:allText.length>100&&allText.length<300,desc:allText.length>500?'Good content length':'Add more content to your resume'},
+  ];
+
+  const passed = checks.filter(c=>c.pass).length;
+  const score = Math.round((passed/checks.length)*100);
+
+  // Update ring
+  const circumference = 377;
+  const offset = circumference-(score/100*circumference);
+  document.getElementById('scoreCircle').style.strokeDashoffset = offset;
+  document.getElementById('atsScoreNum').textContent = score;
+
+  const color = score>=80?'var(--green)':score>=60?'var(--yellow)':'var(--red)';
+  document.getElementById('atsScoreNum').style.color = color;
+
+  const grades = {90:'🏆 Excellent',80:'✅ Good',60:'⚠️ Average',0:'❌ Needs Work'};
+  const grade = Object.entries(grades).reverse().find(([k])=>score>=k);
+  document.getElementById('scoreGrade').textContent = grade[1];
+  document.getElementById('scoreGrade').style.color = color;
+
+  const list = document.getElementById('checksList');
+  list.innerHTML = checks.map(c=>`
+    <li class="check-item ${c.pass?'pass':c.warn?'warn':'fail'}">
+      <span class="check-icon">${c.pass?'✅':c.warn?'⚠️':'❌'}</span>
+      <div class="check-text">
+        <div class="check-title">${c.title}</div>
+        <div class="check-desc">${c.desc}</div>
+      </div>
+    </li>`).join('');
+}
+
+// ===== JOB MATCH =====
+function analyzeJobMatch(){
+  const jd = document.getElementById('jobDescription').value.toLowerCase();
+  if(!jd){alert('Please paste a job description first');return;}
+
+  const d = getFormData();
+  const resumeText = [d.techSkills,d.softSkills,d.summary,...[...document.querySelectorAll('.e_desc')].map(e=>e.value)].join(' ').toLowerCase();
+
+  // Extract keywords from JD (simple tokenization)
+  const stopWords = new Set(['the','a','an','and','or','but','in','on','at','to','for','of','with','by','is','are','was','were','be','been','have','has','had','do','does','did','will','would','could','should','may','might','shall','must','can','need','this','that','these','those','we','they','you','it','our','your','their','us','them']);
+  const words = jd.match(/\b[a-z][a-z0-9+#.-]{2,}\b/g)||[];
+  const freq = {};
+  words.forEach(w=>{if(!stopWords.has(w)){freq[w]=(freq[w]||0)+1;}});
+  
+  // Get top keywords
+  const keywords = Object.entries(freq).filter(([,v])=>v>=1).sort((a,b)=>b[1]-a[1]).slice(0,30).map(([k])=>k);
+
+  const found = keywords.filter(k=>resumeText.includes(k));
+  const missing = keywords.filter(k=>!resumeText.includes(k));
+  const matchPct = Math.round(found.length/keywords.length*100);
+
+  document.getElementById('keywordsResult').style.display='block';
+  document.getElementById('foundKeywords').innerHTML = found.map(k=>`<span class="kw-tag found">${k}</span>`).join('');
+  document.getElementById('missingKeywords').innerHTML = missing.slice(0,15).map(k=>`<span class="kw-tag missing">${k}</span>`).join('');
+  
+  const mc = matchPct>=70?'var(--green)':matchPct>=50?'var(--yellow)':'var(--red)';
+  document.getElementById('matchScore').innerHTML = `<span style="color:${mc}">Job Match Score: ${matchPct}%</span> – ${matchPct>=70?'Great match! Add missing keywords to reach 90%+':matchPct>=50?'Moderate match. Add missing keywords to improve.':'Low match. Tailor your resume to this job.'}`;
+}
+
+// ===== PREVIEW =====
+function generatePreview(){
+  const d = getFormData();
+  const style = document.getElementById('previewStyle').value || selectedTemplate;
+  
+  const exps = [...document.querySelectorAll('.entry-block')].filter(e=>e.id.startsWith('exp')).map(e=>({
+    title: e.querySelector('.e_title')?.value||'',
+    company: e.querySelector('.e_company')?.value||'',
+    start: e.querySelector('.e_start')?.value||'',
+    end: e.querySelector('.e_end')?.value||'',
+    location: e.querySelector('.e_loc')?.value||'',
+    desc: e.querySelector('.e_desc')?.value||'',
+  })).filter(e=>e.title||e.company);
+
+  const edus = [...document.querySelectorAll('.entry-block')].filter(e=>e.id.startsWith('edu')).map(e=>({
+    degree: e.querySelector('.edu_deg')?.value||'',
+    school: e.querySelector('.edu_school')?.value||'',
+    start: e.querySelector('.edu_start')?.value||'',
+    end: e.querySelector('.edu_end')?.value||'',
+    gpa: e.querySelector('.edu_gpa')?.value||'',
+  })).filter(e=>e.degree||e.school);
+
+  const skills = [...(d.techSkills+','+d.softSkills).split(',').map(s=>s.trim())].filter(Boolean);
+  const country = countries.find(c=>c.code===selectedCountry);
+
+  let html = `<div class="resume-${style}">`;
+
+  // Header
+  html += `<div class="res-header">
+    <div class="res-name">${d.name||'Your Name'}</div>
+    <div class="res-title">${d.title||'Your Professional Title'}</div>
+    <div class="res-contact">${[d.email,d.phone,d.location,d.linkedin].filter(Boolean).join(' | ')}</div>
+  </div>`;
+
+  // Summary
+  if(d.summary){
+    html += `<div class="res-section-title">Professional Summary</div>
+    <div class="res-desc">${d.summary}</div>`;
+  }
+
+  // Experience
+  if(exps.length){
+    html += `<div class="res-section-title">Work Experience</div>`;
+    exps.forEach(e=>{
+      const bullets = e.desc.split('\n').filter(Boolean).map(b=>`<li>${b.replace(/^[•\-]/,'').trim()}</li>`).join('');
+      html += `<div class="res-entry">
+        <span class="res-date">${e.start}${e.end?' – '+e.end:''}</span>
+        <div class="res-role">${e.title}</div>
+        <div class="res-company">${e.company}${e.location?' · '+e.location:''}</div>
+        <div class="res-desc"><ul style="padding-left:16px;margin-top:6px">${bullets}</ul></div>
+      </div>`;
+    });
+  }
+
+  // Education
+  if(edus.length){
+    html += `<div class="res-section-title">Education</div>`;
+    edus.forEach(e=>{
+      html += `<div class="res-entry">
+        <span class="res-date">${e.start}${e.end?' – '+e.end:''}</span>
+        <div class="res-role">${e.degree}</div>
+        <div class="res-company">${e.school}${e.gpa?' · GPA: '+e.gpa:''}</div>
+      </div>`;
+    });
+  }
+
+  // Skills
+  if(skills.length){
+    html += `<div class="res-section-title">Skills</div>
+    <div class="res-skills">${skills.map(s=>`<span class="skill-tag">${s}</span>`).join('')}</div>`;
+  }
+
+  html += '</div>';
+  document.getElementById('resumePreview').innerHTML = html;
+}
+
+function changePreviewStyle(){
+  generatePreview();
+}
+
+// ===== COUNTRY REFERENCE LIST =====
+function buildFullCountryList(){
+  const container = document.getElementById('fullCountryList');
+  container.innerHTML = countries.map(c=>`
+    <div style="border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:12px;background:var(--surface2)">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <span style="font-size:36px">${c.flag}</span>
+        <div>
+          <div style="font-size:16px;font-weight:800">${c.name}</div>
+          <div style="font-size:12px;color:var(--accent);font-weight:600">${c.format}</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        ${c.tips.map(t=>`<div style="padding:4px 12px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:11px;color:var(--muted)">${t}</div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+// ===== DOWNLOAD =====
+function downloadPDF(){
+  generatePreview();
+  setTimeout(()=>{
+    const content = document.getElementById('resumePreview').innerHTML;
+    const w = window.open('','_blank');
+    const d = getFormData();
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${d.name||'Resume'}</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      *{margin:0;padding:0;box-sizing:border-box}
+      body{font-family:'DM Sans',Arial,sans-serif;padding:40px;color:#1a1a2e;max-width:800px;margin:0 auto}
+      .resume-classic .res-header{text-align:center;border-bottom:2px solid #1a1a2e;padding-bottom:16px;margin-bottom:20px}
+      .resume-classic .res-name{font-size:28px;font-weight:800;color:#1a1a2e}
+      .resume-classic .res-title,.res-title{font-size:14px;color:#555;margin-top:4px}
+      .res-contact{font-size:12px;color:#555;margin-top:8px}
+      .res-section-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#1a1a2e;border-bottom:1px solid #ddd;padding-bottom:4px;margin:16px 0 10px}
+      .res-entry{margin-bottom:14px}
+      .res-role{font-weight:700;font-size:14px;color:#1a1a2e}
+      .res-company{font-size:13px;color:#444;margin-bottom:4px}
+      .res-date{font-size:11px;color:#888;float:right}
+      .res-desc{font-size:12px;color:#555;line-height:1.6;margin-top:4px}
+      .res-skills{display:flex;flex-wrap:wrap;gap:8px}
+      .skill-tag{padding:3px 10px;border-radius:4px;border:1px solid #ddd;font-size:11px;color:#333}
+      @media print{body{padding:20px}}
+    </style></head><body><div class="resume-classic">${content}</div></body></html>`);
+    w.document.close();
+    setTimeout(()=>w.print(),800);
+  },300);
+}
+</script>
+</body>
+</html>
